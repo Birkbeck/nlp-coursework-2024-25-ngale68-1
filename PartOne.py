@@ -55,8 +55,8 @@ def read_novels(path=Path.cwd() / "texts" / "novels"):
         with open(file, "r", encoding="utf-8") as f:
             text = f.read()
         data.append({"title": title, "author": author, "year": year, "text": text})
-    df = pd.DataFrame(data)
-    df = df.sort_values("year", ignore_index=True)  # Sort by year
+    df = pd.DataFrame(data, columns=["text", "title", "author", "year"])
+    df = df.sort_values("year", ignore_index=True)  # Sort by year, ignoring index
     return df
 
 
@@ -68,7 +68,17 @@ def parse(df, store_path=Path.cwd() / "pickles", out_name="parsed.pickle"):
 
 def nltk_ttr(text):
     """Calculates the type-token ratio of a text. Text is tokenized using nltk.word_tokenize."""
-    pass
+    from nltk import word_tokenize
+    import string
+
+    tokens = word_tokenize(text)
+    # Filter out punctuation and make all tokens lowercase:
+    words = [token.lower() for token in tokens if token.isalpha()]
+    if not words:
+        return 0.0
+    types = set(words)
+    ttr = len(types) / len(words)
+    return ttr
 
 
 def get_ttrs(df):
