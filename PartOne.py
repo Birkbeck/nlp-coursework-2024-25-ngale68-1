@@ -24,7 +24,19 @@ def fk_level(text, d):
     Returns:
         float: The Flesch-Kincaid Grade Level of the text. (higher grade is more difficult)
     """
-    pass
+    from nltk.tokenize import sent_tokenize, word_tokenize
+
+    sentences = sent_tokenize(text)
+    words = [w for w in word_tokenize(text) if w.isalpha()]  # Filter out punctuation
+    num_sentences = len(sentences)
+    num_words = len(words)
+    num_syllables = sum(count_syl(w, d) for w in words)
+
+    if num_sentences == 0 or num_words == 0:
+        return 0.0
+
+    fkgl = 0.39 * (num_words / num_sentences) + 11.8 * (num_syllables / num_words) - 15.59
+    return fkgl
 
 
 def count_syl(word, d):
@@ -38,7 +50,13 @@ def count_syl(word, d):
     Returns:
         int: The number of syllables in the word.
     """
-    pass
+    import re
+
+    word = word.lower()
+    if word in d:
+        return [len([y for y in x if y[-1].isdigit()]) for x in d[word]][0]  # CMU dict: each pronunciation is a list of phonemes, vowels have digits
+    else:
+        return len(re.findall(r"[aeiouy]+", word))  # Count vowel clusters as syllables
 
 
 def read_novels(path=Path.cwd() / "texts" / "novels"):
@@ -72,8 +90,7 @@ def nltk_ttr(text):
     import string
 
     tokens = word_tokenize(text)
-    # Filter out punctuation and make all tokens lowercase:
-    words = [token.lower() for token in tokens if token.isalpha()]
+    words = [w.lower() for w in tokens if w.isalpha()] # Filter out punctuation and make all tokens lowercase
     if not words:
         return 0.0
     types = set(words)
