@@ -78,6 +78,16 @@ def read_novels(path=Path.cwd() / "texts" / "novels"):
     return df
 
 
+def flesch_kincaid(df):
+    """Returns a dictionary mapping title to Flesch-Kincaid grade level."""
+    import nltk
+    cmudict = nltk.corpus.cmudict.dict()
+    results = {}
+    for i, row in df.iterrows():
+        results[row["title"]] = round(fk_level(row["text"], cmudict), 4)
+    return results
+
+
 def parse(df, store_path=Path.cwd() / "pickles", out_name="parsed.pickle"):
     """Parses the text of a DataFrame using spaCy, stores the parsed docs as a column and writes 
     the resulting  DataFrame to a pickle file"""

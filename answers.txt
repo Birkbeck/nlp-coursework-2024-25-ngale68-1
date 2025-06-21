@@ -1,1 +1,18 @@
-Answers to the text questions go here.
+Question 1(d):
+The Flesch-Kincaid (FK) score can be unreliable in two key scenarios:
+
+1. Non-standard grammar or literary style:
+FK assumes standard sentence structure and punctuation. Texts with irregular grammar, such as
+stream-of-consciousness writing (e.g., James Joyce), or those with long, complex sentences 
+broken by semicolons or em dashes, can confuse sentence tokenizers and distort average sentence 
+length, leading to misleading scores.
+
+2. Vocabulary and conceptual complexity:
+FK is based only on surface-level metrics — word length (syllables) and sentence length — and 
+does not account for semantic difficulty. A text can have short, simple words and sentences but 
+convey complex, abstract, or domain-specific concepts (e.g., legal or philosophical texts), 
+which are cognitively demanding despite scoring as “easy.”
+
+Additionally, FK performs poorly on poetry, dialogue-heavy texts, or any content where 
+readability depends more on cultural context or background knowledge than linguistic structure.
+
