@@ -160,7 +160,38 @@ def get_fks(df):
 
 def subjects_by_verb_pmi(doc, target_verb):
     """Extracts the most common subjects of a given verb in a parsed document. Returns a list."""
-    pass
+    # Count all subjects and all subjects of the target verb
+    subj_counter = Counter()
+    subj_verb_counter = Counter()
+    total_sents = 0
+
+    for sent in doc.sents:
+        total_sents += 1
+        for tok in sent:
+            if tok.dep_ in ("nsubj", "nsubjpass"):
+                subj_counter[tok.text.lower()] += 1
+                # Check if head is the target verb
+                if tok.head.pos_ == "VERB" and tok.head.lemma_.lower() == target_verb.lower():
+                    subj_verb_counter[tok.text.lower()] += 1
+
+    # PMI calculation: PMI(x, y) = log2(P(x, y) / (P(x) * P(y)))
+    # Here, x = subject, y = verb
+    total_subj = sum(subj_counter.values())
+    total_subj_verb = sum(subj_verb_counter.values())
+    if total_subj == 0 or total_subj_verb == 0:
+        return []
+    p_verb = total_subj_verb / total_subj  # Approximate P(verb) as freq of verb subjects / all subjects
+
+    pmi_scores = []
+    for subj, subj_verb_count in subj_verb_counter.items():
+        p_subj = subj_counter[subj] / total_subj
+        p_subj_verb = subj_verb_count / total_subj
+        if p_subj > 0 and p_verb > 0 and p_subj_verb > 0:
+            pmi = math.log2(p_subj_verb / (p_subj * p_verb))
+            pmi_scores.append((subj, pmi, subj_verb_count))
+    # Sort by PMI, then by frequency
+    pmi_scores.sort(key=lambda x: (-x[1], -x[2]))
+    return [(subj, round(pmi, 3), freq) for subj, pmi, freq in pmi_scores[:10]]
 
 
 
@@ -181,7 +212,10 @@ def subjects_by_verb_count(doc, verb):
 
 def object_counts(doc):
     """Extracts the most common syntactic objects in a parsed document. Returns a list of tuples."""
-    pass
+    from collections import Counter
+
+    objects = [token.text.lower() for token in doc if token.dep_ in ("dobj", "obj")]
+    return Counter(objects).most_common(10)
 
 
 
