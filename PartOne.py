@@ -239,18 +239,22 @@ if __name__ == "__main__":
     df = pd.read_pickle(Path.cwd() / "pickles" /"parsed.pickle")
     # print(object_counts(df))
      
+    # f(i)
+    for i, row in df.iterrows():
+        print(row["title"])
+        print(object_counts(row["parsed"]))
+        print("\n")
+
+    # f(ii)
     for i, row in df.iterrows():
         print(row["title"])
         print(subjects_by_verb_count(row["parsed"], "hear"))
         print("\n")
 
+    # f(iii)
     for i, row in df.iterrows():
         print(row["title"])
         print(subjects_by_verb_pmi(row["parsed"], "hear"))
         print("\n")
     
-    for i, row in df.iterrows():
-        print(row["title"])
-        print(object_counts(row["parsed"]))
-        print("\n")
 
