@@ -91,7 +91,40 @@ def flesch_kincaid(df):
 def parse(df, store_path=Path.cwd() / "pickles", out_name="parsed.pickle"):
     """Parses the text of a DataFrame using spaCy, stores the parsed docs as a column and writes 
     the resulting  DataFrame to a pickle file"""
-    pass
+    
+    import os
+
+    os.makedirs(store_path, exist_ok=True) # Ensure output directory exists
+
+    parsed_docs = []
+    max_length = nlp.max_length
+
+    for text in df["text"]:
+        # If text is too long, split into chunks and parse separately
+        if len(text) > max_length:
+            docs = []
+            for i in range(0, len(text), max_length - 1000):  # leave a margin
+                chunk = text[i:i + max_length - 1000]
+                docs.append(nlp(chunk))
+            # Concatenate all tokens from chunks into a single Doc
+            from spacy.tokens import Doc
+            all_tokens = []
+            for doc in docs:
+                all_tokens.extend([t for t in doc])
+            # Create a new Doc from all tokens (metadata will be lost)
+            parsed_doc = Doc(nlp.vocab, words=[t.text for t in all_tokens])
+        else:
+            parsed_doc = nlp(text)
+        parsed_docs.append(parsed_doc)
+
+    df = df.copy()
+    df["parsed"] = parsed_docs
+
+    # Save to pickle
+    pickle_path = store_path / out_name
+    df.to_pickle(pickle_path)
+
+    return df
 
 
 def nltk_ttr(text):
@@ -133,12 +166,21 @@ def subjects_by_verb_pmi(doc, target_verb):
 
 def subjects_by_verb_count(doc, verb):
     """Extracts the most common subjects of a given verb in a parsed document. Returns a list."""
-    pass
+    # Find subjects of the specified verb (any tense)
+    subjects = []
+    for tok in doc:
+        # Check if token is a verb with the correct lemma
+        if tok.pos_ == "VERB" and tok.lemma_.lower() == verb.lower():
+            # Find its subject(s)
+            for child in tok.children:
+                if child.dep_ in ("nsubj", "nsubjpass"):
+                    subjects.append(child.text.lower())
+    return Counter(subjects).most_common(10)
 
 
 
-def adjective_counts(doc):
-    """Extracts the most common adjectives in a parsed document. Returns a list of tuples."""
+def object_counts(doc):
+    """Extracts the most common syntactic objects in a parsed document. Returns a list of tuples."""
     pass
 
 
@@ -157,7 +199,7 @@ if __name__ == "__main__":
     #print(get_ttrs(df))
     #print(get_fks(df))
     #df = pd.read_pickle(Path.cwd() / "pickles" /"name.pickle")
-    # print(adjective_counts(df))
+    # print(object_counts(df))
     """ 
     for i, row in df.iterrows():
         print(row["title"])
