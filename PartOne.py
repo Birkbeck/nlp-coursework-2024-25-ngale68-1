@@ -6,6 +6,10 @@ import nltk
 import spacy
 from pathlib import Path
 import pandas as pd
+from collections import Counter
+import math
+nltk.download("punkt")
+nltk.download("cmudict")
 
 
 nlp = spacy.load("en_core_web_sm")
@@ -232,8 +236,8 @@ if __name__ == "__main__":
     print(df.head())
     print(get_ttrs(df))
     print(get_fks(df))
-    df = pd.read_pickle(Path.cwd() / "pickles" /"name.pickle")
-    print(object_counts(df))
+    df = pd.read_pickle(Path.cwd() / "pickles" /"parsed.pickle")
+    # print(object_counts(df))
      
     for i, row in df.iterrows():
         print(row["title"])
