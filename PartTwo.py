@@ -36,7 +36,35 @@ def vectorise_and_split(df):
     return X_train, X_test, y_train, y_test, vectoriser
 
 
+# 2c - Train a classifier:
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.svm import SVC
+from sklearn.metrics import classification_report, f1_score
+
+def classifiers_eval(X_train, X_test, y_train, y_test):
+    # Random Forest
+    rf = RandomForestClassifier(n_estimators=300, random_state=26)
+    rf.fit(X_train, y_train)
+    y_pred_rf = rf.predict(X_test)
+    print(f1_score(y_test, y_pred_rf, average='macro'))
+    print(classification_report(y_test, y_pred_rf))
+
+    # SVM
+    svm = SVC(kernel='linear', random_state=26)
+    svm.fit(X_train, y_train)
+    y_pred_svm = svm.predict(X_test)
+    print(f1_score(y_test, y_pred_svm, average='macro'))
+    print(classification_report(y_test, y_pred_svm))
+
+
+
 if __name__ == "__main__":
     # 2a
     path = r"p2-texts\hansard40000.csv"
     df = preprocess_hansard(path)
+
+    # 2b
+    X_train, X_test, y_train, y_test, vectoriser = vectorise_and_split(df)
+
+    # 2c
+    classifiers_eval(X_train, X_test, y_train, y_test)
