@@ -56,6 +56,14 @@ def classifiers_eval(X_train, X_test, y_train, y_test):
     print(classification_report(y_test, y_pred_svm))
 
 
+# 2e - Custom tokenizer:
+import spacy
+nlp = spacy.load("en_core_web_sm", disable=["parser", "ner"])
+
+def spacy_tokenizer(text):
+    doc = nlp(text)
+    return [token.lemma_.lower() for token in doc if token.is_alpha and not token.is_stop]
+
 
 if __name__ == "__main__":
     # 2a
@@ -70,6 +78,17 @@ if __name__ == "__main__":
     #classifiers_eval(X_train, X_test, y_train, y_test)
 
     # 2d
-    vectoriser_ng = TfidfVectorizer(stop_words='english', max_features=3000, ngram_range=(1,3))
-    X_train_ng, X_test_ng, y_train_ng, y_test_ng, vectoriser_ng = vectorise_and_split(df, vectoriser_ng)
-    classifiers_eval(X_train_ng, X_test_ng, y_train_ng, y_test_ng)
+    #vectoriser_ng = TfidfVectorizer(stop_words='english', max_features=3000, ngram_range=(1,3))
+    #X_train_ng, X_test_ng, y_train_ng, y_test_ng, vectoriser_ng = vectorise_and_split(df, vectoriser_ng)
+    #classifiers_eval(X_train_ng, X_test_ng, y_train_ng, y_test_ng)
+
+    # 2e
+    vectoriser_custom = TfidfVectorizer(
+        tokenizer=spacy_tokenizer,
+        max_features=3000,
+        ngram_range=(1, 3),   # unigrams, bigrams, trigrams
+        min_df=3,             # ignore terms in fewer than 3 docs
+        max_df=0.8            # ignore terms in more than 80% of docs
+    )
+    X_train_c, X_test_c, y_train_c, y_test_c, _ = vectorise_and_split(df, vectoriser_custom)
+    classifiers_eval(X_train_c, X_test_c, y_train_c, y_test_c)
