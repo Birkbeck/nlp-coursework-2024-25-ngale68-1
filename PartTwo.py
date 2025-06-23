@@ -71,16 +71,16 @@ if __name__ == "__main__":
     df = preprocess_hansard(path)
 
     # 2b
-    #vectoriser = TfidfVectorizer(stop_words='english', max_features=3000)
-    #X_train, X_test, y_train, y_test, vectoriser = vectorise_and_split(df, vectoriser)
+    vectoriser = TfidfVectorizer(stop_words='english', max_features=3000)
+    X_train, X_test, y_train, y_test, vectoriser = vectorise_and_split(df, vectoriser)
 
     # 2c
-    #classifiers_eval(X_train, X_test, y_train, y_test)
+    classifiers_eval(X_train, X_test, y_train, y_test)
 
     # 2d
-    #vectoriser_ng = TfidfVectorizer(stop_words='english', max_features=3000, ngram_range=(1,3))
-    #X_train_ng, X_test_ng, y_train_ng, y_test_ng, vectoriser_ng = vectorise_and_split(df, vectoriser_ng)
-    #classifiers_eval(X_train_ng, X_test_ng, y_train_ng, y_test_ng)
+    vectoriser_ng = TfidfVectorizer(stop_words='english', max_features=3000, ngram_range=(1,3))
+    X_train_ng, X_test_ng, y_train_ng, y_test_ng, vectoriser_ng = vectorise_and_split(df, vectoriser_ng)
+    classifiers_eval(X_train_ng, X_test_ng, y_train_ng, y_test_ng)
 
     # 2e
     vectoriser_custom = TfidfVectorizer(
